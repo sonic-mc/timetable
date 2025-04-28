@@ -10,35 +10,21 @@
     <div class="container mt-4">
         <h2 class="mb-4">School Timetable Configuration</h2>
 
-        <!-- Add/Edit Teachers -->
-        <div class="card mb-4">
-            <div class="card-header">Add / Edit Teacher</div>
-            <div class="card-body">
-                <form action="Route::resource('teachers', TeacherController::class)" method="POST">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <input type="hidden" name="id" value="">
-                    <div class="form-group">
-                        <label for="teacher_name">Name</label>
-                        <input type="text" name="name" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary mt-2">Save Teacher</button>
-                </form>
-            </div>
-        </div>
+  
 
         <!-- Add Classes & Subjects -->
         <div class="row mb-4">
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header">Add Class</div>
+                    <div class="card-header">Add Teacher</div>
                     <div class="card-body">
-                        <form action="Route::resource('teachers', ClassRoomController::class)" method="POST">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <form action="/teachers" method="POST">
+                            @csrf
                             <div class="form-group">
-                                <label for="class_name">Class Name</label>
+                                <label for="class_name">Teacher's Name</label>
                                 <input type="text" name="name" class="form-control" required>
                             </div>
-                            <button type="submit" class="btn btn-success mt-2">Add Class</button>
+                            <button type="submit" class="btn btn-success mt-2">Add Teacher</button>
                         </form>
                     </div>
                 </div>
@@ -47,8 +33,8 @@
                 <div class="card">
                     <div class="card-header">Add Subject</div>
                     <div class="card-body">
-                        <form action="Route::resource('teachers', SubjectController::class)" method="POST">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <form action="/subjects" method="POST">
+                            @csrf
                             <div class="form-group">
                                 <label for="subject_name">Subject Name</label>
                                 <input type="text" name="name" class="form-control" required>
@@ -68,8 +54,8 @@
         <div class="card mb-4">
             <div class="card-header">Assign Subjects to Classes</div>
             <div class="card-body">
-                <form action="Route::resource('teachers', AssignmentController::class)" method="POST">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <form action="/assignments" method="POST">
+                    @csrf
                     <div class="form-group">
                         <label for="class_id">Select Class</label>
                         <select name="class_id" class="form-control" required>
@@ -99,8 +85,8 @@
         <div class="card mb-4">
             <div class="card-header">Configure Available Timeslots</div>
             <div class="card-body">
-                <form action="Route::resource('teachers', TimeslotController::class)" method="POST">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <form action="/timeslots" method="POST">
+                    @csrf
                     <div class="form-group">
                         <label for="day">Day</label>
                         <select name="day" class="form-control" required>
@@ -121,10 +107,18 @@
                     </div>
                     <button type="submit" class="btn btn-dark mt-2">Add Timeslot</button>
                 </form>
+
+                    <!-- Generate Timetable Button -->
+                    <div class="text-center mb-5">
+                       
+                        <a href="{{ route('generate.timetable')}}" id="generateBtn" class="btn btn-lg btn-primary">Generate Timetable</button>
+                        
+                    </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+   
 </body>
 </html>

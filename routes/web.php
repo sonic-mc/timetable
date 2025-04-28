@@ -29,4 +29,5 @@ Route::resource('subjects', SubjectController::class);
 Route::resource('assignments', AssignmentController::class);
 Route::resource('timeslots', TimeslotController::class);
 
-Route::get('/timetable', [TimetableController::class, 'generateTimetable'])->name('timetable.generate');
+Route::get('/generate-timetable', [TimetableController::class, 'generate'])->name('generate.timetable');
+

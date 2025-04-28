@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Timetable extends Model
 {
     use HasFactory;
+    protected $guarded = [];
     public function class()
     {
         return $this->belongsTo(ClassRoom::class, 'class_id');

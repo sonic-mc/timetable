@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Assignment;
+use Illuminate\Http\Request;
+
 
 class AssignmentController extends Controller
 {

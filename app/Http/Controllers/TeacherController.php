@@ -16,9 +16,8 @@ class TeacherController extends Controller
 
     public function store(Request $request)
     {
-        Teacher::updateOrCreate(
-            ['id' => $request->id],
-            ['name' => $request->name]
+        Teacher::create(
+             ['name' => $request->name]
         );
         return redirect()->back()->with('success', 'Teacher saved successfully.');
     }

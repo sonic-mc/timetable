@@ -8,6 +8,7 @@ use App\Models\ClassRoom;
 use App\Models\Subject;
 use App\Models\Timeslot;
 use App\Models\Assignment;
+use Illuminate\Support\Facades\DB;
 
 class TimetableController extends Controller
 {
@@ -48,25 +49,77 @@ class TimetableController extends Controller
         Timetable::destroy($id);
         return redirect()->back()->with('success', 'Entry deleted.');
     }
-    public function generateTimetable()
+    public function generate()
     {
-        $timeslots = Timeslot::all();
-        $classes = ClassRoom::all();
-        $assignments = Assignment::with(['subject', 'classroom'])->get();
-    
-        // Create a timetable array based on classes, timeslots, and assignments
-        $timetable = [];
-        foreach ($classes as $class) {
-            foreach ($timeslots as $timeslot) {
-                $timetable[$class->name][$timeslot->day][] = [
-                    'subject' => $assignments->firstWhere('class_id', $class->id)->subject->name ?? 'Free',
-                    'start_time' => $timeslot->start_time,
-                    'end_time' => $timeslot->end_time,
-                ];
-            }
-        }
-    
-        return view('timetable', compact('timetable'));
-    }
-}
+        // Start clean
+        DB::beginTransaction();
+        
+        try {
+            // 1. Get all assignments
+            $assignments = Assignment::with('subject', 'classRoom')->get();
 
+            // 2. Get all timeslots
+            $timeslots = Timeslot::all();
+
+            if ($assignments->isEmpty() || $timeslots->isEmpty()) {
+                return back()->with('error', 'No assignments or timeslots found.');
+            }
+
+            // 3. Initialize empty timetable array
+            $timetable = [
+                'Monday' => [],
+                'Tuesday' => [],
+                'Wednesday' => [],
+                'Thursday' => [],
+                'Friday' => [],
+            ];
+
+            // 4. Loop and generate entries
+            foreach ($assignments as $assignment) {
+                foreach ($timeslots as $timeslot) {
+                    // Safety check
+                    if (!isset($timetable[$timeslot->day])) {
+                        $timetable[$timeslot->day] = [];
+                    }
+
+                    $timetable[$timeslot->day][] = [
+                        'class_id' => $assignment->class_id,
+                        'subject_id' => $assignment->subject_id,
+                        // 'teacher_id' => Subject::find( $assignment->subject_id),
+                        'teacher_id' =>1,
+                        'timeslot_id' => $timeslot->id,
+                    ];
+                }
+            }
+
+            // 5. Save the generated timetable into database
+            foreach ($timetable as $day => $entries) {
+                foreach ($entries as $entry) {
+                    // dd([
+                    //     'class_id' => $entry['class_id'],
+                    //     'subject_id' => $entry['subject_id'],
+                    //     // 'timeslot_id' => $entry['timeslot_id'],
+                    //     'teacher_id' => $entry['teacher_id'],
+                    //     'day'=>$day,
+                    // ]);
+                    Timetable::create([
+                        'class_id' => $entry['class_id'],
+                        'subject_id' => $entry['subject_id'],
+                        // 'timeslot_id' => $entry['timeslot_id'],
+                        'teacher_id' => $entry['teacher_id'],
+                        'day'=>$day,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return back()->with('success', 'Timetable generated successfully!');
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+            DB::rollBack();
+            return back()->with('error', 'Failed to generate timetable: ' . $e->getMessage());
+        }
+    }
+
+}
