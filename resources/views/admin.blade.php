@@ -112,7 +112,8 @@
                     <div class="text-center mb-5">
                        
                         <a href="{{ route('generate.timetable')}}" id="generateBtn" class="btn btn-lg btn-primary">Generate Timetable</button>
-                        
+                            <a href="{{ route('admin.sample') }}" class="btn btn-outline-secondary mt-3">View Timetable</a>
+
                     </div>
             </div>
         </div>

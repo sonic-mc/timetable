@@ -85,7 +85,6 @@ class TimetableController extends Controller
                     $timetable[$timeslot->day][] = [
                         'class_id' => $assignment->class_id,
                         'subject_id' => $assignment->subject_id,
-                        // 'teacher_id' => Subject::find( $assignment->subject_id),
                         'teacher_id' =>1,
                         'timeslot_id' => $timeslot->id,
                     ];
@@ -95,13 +94,7 @@ class TimetableController extends Controller
             // 5. Save the generated timetable into database
             foreach ($timetable as $day => $entries) {
                 foreach ($entries as $entry) {
-                    // dd([
-                    //     'class_id' => $entry['class_id'],
-                    //     'subject_id' => $entry['subject_id'],
-                    //     // 'timeslot_id' => $entry['timeslot_id'],
-                    //     'teacher_id' => $entry['teacher_id'],
-                    //     'day'=>$day,
-                    // ]);
+                  
                     Timetable::create([
                         'class_id' => $entry['class_id'],
                         'subject_id' => $entry['subject_id'],
@@ -122,4 +115,5 @@ class TimetableController extends Controller
         }
     }
 
+   
 }
