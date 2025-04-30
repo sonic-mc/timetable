@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Subject extends Model
 {
     use HasFactory;
-    protected $fillable = ['name',];
+    protected $fillable = ['name', 'code'];
     public function timetables()
     {
         return $this->hasMany(Timetable::class);

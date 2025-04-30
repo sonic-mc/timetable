@@ -23,6 +23,7 @@ class TimetableController extends Controller
         $classes = ClassRoom::all();
         $subjects = Subject::all();
         $timeslots = Timeslot::all();
+        
 
         return view('admin.timetables.create', compact('classes', 'subjects', 'timeslots'));
     }
@@ -33,12 +34,16 @@ class TimetableController extends Controller
             'class_id' => 'required|exists:school_classes,id',
             'subject_id' => 'required|exists:subjects,id',
             'timeslot_id' => 'required|exists:timeslots,id',
+            'start_time' => 'required',
+            'end_time' => 'required',
         ]);
 
         Timetable::create([
             'class_id' => $request->class_id,
             'subject_id' => $request->subject_id,
             'timeslot_id' => $request->timeslot_id,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
         ]);
 
         return redirect()->route('timetables.index')->with('success', 'Timetable entry added.');
@@ -87,6 +92,8 @@ class TimetableController extends Controller
                         'subject_id' => $assignment->subject_id,
                         'teacher_id' =>1,
                         'timeslot_id' => $timeslot->id,
+                        'start_time'=> $timeslot->start_time,
+                        'end_time'=> $timeslot->end_time
                     ];
                 }
             }
@@ -94,13 +101,15 @@ class TimetableController extends Controller
             // 5. Save the generated timetable into database
             foreach ($timetable as $day => $entries) {
                 foreach ($entries as $entry) {
-                  
+                //   dd($entry);
                     Timetable::create([
                         'class_id' => $entry['class_id'],
                         'subject_id' => $entry['subject_id'],
-                        // 'timeslot_id' => $entry['timeslot_id'],
                         'teacher_id' => $entry['teacher_id'],
                         'day'=>$day,
+                        
+                        'start_time'=> $entry['start_time'],
+                        'end_time'=> $entry['end_time']
                     ]);
                 }
             }
@@ -115,5 +124,42 @@ class TimetableController extends Controller
         }
     }
 
-   
+   public function show()
+{
+    $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    $slots = [
+        '08:00 - 09:00',
+        '09:00 - 10:00',
+        '10:00 - 11:00', // Lunch
+        '11:00 - 12:00',
+        '12:00 - 01:00',
+        '01:00 - 02:00'
+    ];
+
+    // Fetch all with relationships
+    $entries = Timetable::with(['subject', 'timeslot'])->get();
+
+    // Initialize empty structure
+    $timetable = [];
+    foreach ($days as $day) {
+        foreach ($slots as $slot) {
+            $timetable[$day][$slot] = '';
+        }
+    }
+
+    // Fill the timetable
+    foreach ($entries as $entry) {
+        if (!$entry->timeslot) continue;
+
+        $formattedSlot = \Carbon\Carbon::parse($entry->timeslot->start_time)->format('H:i') . ' - ' .
+                         \Carbon\Carbon::parse($entry->timeslot->end_time)->format('H:i');
+
+        if (in_array($entry->day, $days) && isset($timetable[$entry->day][$formattedSlot])) {
+            $timetable[$entry->day][$formattedSlot] = $entry->subject->name ?? '';
+        }
+    }
+
+    return view('admin.sample', compact('days', 'slots', 'timetable'));
+}
+
 }

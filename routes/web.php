@@ -31,9 +31,10 @@ Route::resource('timeslots', TimeslotController::class);
 
 Route::get('/generate-timetable', [TimetableController::class, 'generate'])->name('generate.timetable');
 
-Route::get('/timetable/sample', function () {
-    return view('admin.sample');
-})->name('admin.sample');
+//Route::get('/timetable/sample', function () {
+   // return view('admin.sample');
+//})->name('admin.sample');
 
+Route::get('/timetable/sample', [TimetableController::class, 'show'])->name('admin.sample');
 
 
